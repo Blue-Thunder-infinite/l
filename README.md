@@ -529,26 +529,26 @@ TSection:NewToggle("FARM ZONE #1 [Edificio en construcción]", "", function(stat
     end
 end)
 StatSection:NewDropdown("AutoStats", "", {"vitality","healing","strength","energy","flight","speed","climbing","swinging","fireball","frost","lightning","power","telekinesis","shield","laserVision","metalSkin"}, function(currentOption)
-	selectedstat = currentOption;
-end);
-StatSection:NewToggle("Toggle AutoStats", "", function(state)
-    if state then
-       getgenv().AutoStats = true;
-       while AutoStats do
-           wait(0.1);
-           spawn(function()
-               local invokeServer = game:GetService("ReplicatedStorage").Events.UpgradeAbility.InvokeServer
-               for _ = 1, 10 do
-                   invokeServer(game:GetService("ReplicatedStorage").Events.UpgradeAbility, selectedstat)
-               end
-           end);
-       end
-   else
-       spawn(function()
-           getgenv().AutoStats = false;
-       end);
-   end
-end);
+    selectedstat = currentOption
+end)
+
+local upgradeAmounts = {50, 100, 150, 300, 450, 600, 800, 1000, 1500, 2000, 3000, 6000, 8000, 10000, 15000, 20000, 30000}
+
+for _, amount in ipairs(upgradeAmounts) do
+    StatSection:NewButton("Upgrade Stat " .. amount .. "x", "", function()
+        if selectedstat then
+            for i = 1, amount do
+                task.spawn(function()
+                    game:GetService("ReplicatedStorage").Events.UpgradeAbility:InvokeServer(selectedstat)
+                end)
+            end
+            print("Mejora completada: " .. amount .. " veces en", selectedstat)
+        else
+            print(" Selecciona una estadística antes de mejorar.")
+        end
+    end)
+end
+StatSection:NewLabel("Entre mas alto el numero mas lag")
 MainSection:NewToggle("Autofarm Orbs", "", function(state)
 	if state then
 		getgenv().OrbFarm = true;
@@ -1962,7 +1962,7 @@ loadstring(game:HttpGet(Url))()
 end);
 GSection:NewButton("Infinite Yield", "", function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
-end)
+end);
 local MainSection = Tab:NewSection("Script Tlaloc", colors);
 local TargetSection = TargetTab:NewSection("Script Tlaloc", colors);
 local SSection = STab:NewSection("Script Tlaloc", colors);
